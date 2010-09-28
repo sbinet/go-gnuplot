@@ -101,6 +101,18 @@ func (self *Plotter) Close() (err os.Error) {
 	return err
 }
 
+func (self *Plotter) PlotNd(title string, data ...[]float) os.Error {
+	ndims := len(data)
+
+	switch ndims {
+	case 1: return self.PlotX(data[0], title)
+	case 2: return self.PlotXY(data[0], data[1], title)
+	case 3: return self.PlotXYZ(data[0], data[1], data[2], title)
+	}
+
+	return &gnuplot_error{fmt.Sprintf("invalid number of dims '%v'", ndims)}
+}
+
 func (self *Plotter) PlotX(data []float, title string) os.Error {
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
 	if err != nil {
@@ -253,6 +265,42 @@ func (self *Plotter) SetXLabel(label string) os.Error {
 
 func (self *Plotter) SetYLabel(label string) os.Error {
 	return self.Cmd(fmt.Sprintf("set ylabel '%s'", label))
+}
+
+func (self *Plotter) SetZLabel(label string) os.Error {
+	return self.Cmd(fmt.Sprintf("set zlabel '%s'", label))
+}
+
+func (self *Plotter) SetLabels(labels ...string) os.Error {
+	ndims := len(labels)
+	if ndims > 3 || ndims <= 0 {
+		return &gnuplot_error{fmt.Sprintf("invalid number of dims '%v'", ndims)}
+	}
+	var err os.Error = nil
+
+	for i,label := range labels {
+		switch i {
+		case 0: 
+			ierr := self.SetXLabel(label)
+			if ierr != nil {
+				err = ierr
+				return err
+			}
+		case 1:
+			ierr := self.SetYLabel(label)
+			if ierr != nil {
+				err = ierr
+				return err
+			}
+		case 2:
+			ierr := self.SetZLabel(label)
+			if ierr != nil {
+				err = ierr
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (self *Plotter) ResetPlot() (err os.Error) {

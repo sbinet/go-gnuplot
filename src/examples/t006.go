@@ -18,14 +18,14 @@ func main() {
 	p.CheckedCmd("set grid x")
 	p.CheckedCmd("set grid y")
 	p.CheckedCmd("set grid z")
-	p.PlotXYZ(
+	p.PlotNd(
+		"test Nd plot",
 		[]float{0,1,2,3,4,5,6,7,8,9,10},
 		[]float{0,1,2,3,4,5,6,7,8,9,10},
-		[]float{0,1,2,3,4,5,6,7,8,9,10},
-		"test 3d plot")
+		[]float{0,1,2,3,4,5,6,7,8,9,10})
 	p.SetLabels("x", "y", "z")
 	p.CheckedCmd("set terminal pdf")
-	p.CheckedCmd("set output 'plot005.pdf'")
+	p.CheckedCmd("set output 'plot006.pdf'")
 	p.CheckedCmd("replot")
 
 
