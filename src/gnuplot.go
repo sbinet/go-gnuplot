@@ -128,6 +128,37 @@ func (self *Plotter) PlotX(data []float, title string) os.Error {
 	return self.Cmd(line)
 }
 
+func (self *Plotter) PlotXYZ(x,y,z []float, title string) os.Error {
+	npoints := min(len(x), len(y))
+	npoints = min(npoints, len(z))
+	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
+	if err != nil {
+		return err
+	}
+	fname := f.Name()
+	self.tmpfiles[fname] = f
+
+	for i:=0; i < npoints; i++ {
+		f.WriteString(fmt.Sprintf("%v %v %v\n", x[i], y[i], z[i]))
+	}
+
+	f.Close()
+	cmd := "splot"
+	if self.nplots > 0 {
+		cmd = "replot"
+	}
+	
+	var line string
+	if title == "" {
+		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, self.style)
+	} else {
+		line = fmt.Sprintf("%s \"%s\" title \"%s\" with %s",
+			cmd, fname, title, self.style)
+	}
+	self.nplots += 1
+	return self.Cmd(line)
+}
+
 func (self *Plotter) PlotXY(x,y []float, title string) os.Error {
 	npoints := min(len(x), len(y))
 
