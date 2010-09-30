@@ -72,7 +72,7 @@ type Plotter struct {
 }
 
 func (self *Plotter) Cmd(format string, a ...interface{}) os.Error {
-	cmd := fmt.Sprintf(format, a) + "\n"
+	cmd := fmt.Sprintf(format, a...) + "\n"
 	n,err := self.proc.handle.Stdin.WriteString(cmd)
 	
 	if self.debug {
@@ -86,7 +86,7 @@ func (self *Plotter) Cmd(format string, a ...interface{}) os.Error {
 }
 
 func (self *Plotter) CheckedCmd(format string, a ...interface{}) {
-	err := self.Cmd(format, a)
+	err := self.Cmd(format, a...)
 	if err != nil {
 		err_string := fmt.Sprintf("** err: %v\n", err)
 		panic(err_string)
