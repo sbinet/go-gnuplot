@@ -17,8 +17,8 @@ func main() {
 	defer p.Close()
 
 	p.SetStyle("steps")
-	p.PlotFunc([]float{0,1,2,3,4,5,6,7,8,9,10}, 
-		func (x float) float {return float(math.Exp(float64(x) + 2.))},
+	p.PlotFunc([]float64{0,1,2,3,4,5,6,7,8,9,10}, 
+		func (x float64) float64 {return math.Exp(float64(x) + 2.)},
 		"test plot-func")
 	p.SetXLabel("my x data")
 	p.SetYLabel("my y data")

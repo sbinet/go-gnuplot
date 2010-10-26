@@ -20,9 +20,9 @@ func main() {
 	p.CheckedCmd("set grid z")
 	p.PlotNd(
 		"test Nd plot",
-		[]float{0,1,2,3,4,5,6,7,8,9,10},
-		[]float{0,1,2,3,4,5,6,7,8,9,10},
-		[]float{0,1,2,3,4,5,6,7,8,9,10})
+		[]float64{0,1,2,3,4,5,6,7,8,9,10},
+		[]float64{0,1,2,3,4,5,6,7,8,9,10},
+		[]float64{0,1,2,3,4,5,6,7,8,9,10})
 	p.SetLabels("x", "y", "z")
 	p.CheckedCmd("set terminal pdf")
 	p.CheckedCmd("set output 'plot006.pdf'")

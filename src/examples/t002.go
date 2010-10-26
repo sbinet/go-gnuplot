@@ -16,7 +16,7 @@ func main() {
 	}
 	defer p.Close()
 
-	p.PlotXY([]float{0,1,2,3,4,5,6,7,8,9,10}, "some data")
+	p.PlotXY([]float64{0,1,2,3,4,5,6,7,8,9,10}, "some data")
 	p.CheckedCmd("set terminal pdf")
 	p.CheckedCmd("set output 'plot002.pdf'")
 	p.CheckedCmd("replot")
