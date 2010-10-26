@@ -101,7 +101,7 @@ func (self *Plotter) Close() (err os.Error) {
 	return err
 }
 
-func (self *Plotter) PlotNd(title string, data ...[]float) os.Error {
+func (self *Plotter) PlotNd(title string, data ...[]float64) os.Error {
 	ndims := len(data)
 
 	switch ndims {
@@ -113,7 +113,7 @@ func (self *Plotter) PlotNd(title string, data ...[]float) os.Error {
 	return &gnuplot_error{fmt.Sprintf("invalid number of dims '%v'", ndims)}
 }
 
-func (self *Plotter) PlotX(data []float, title string) os.Error {
+func (self *Plotter) PlotX(data []float64, title string) os.Error {
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
 	if err != nil {
 		return err
@@ -140,7 +140,7 @@ func (self *Plotter) PlotX(data []float, title string) os.Error {
 	return self.Cmd(line)
 }
 
-func (self *Plotter) PlotXY(x,y []float, title string) os.Error {
+func (self *Plotter) PlotXY(x,y []float64, title string) os.Error {
 	npoints := min(len(x), len(y))
 
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
@@ -171,7 +171,7 @@ func (self *Plotter) PlotXY(x,y []float, title string) os.Error {
 	return self.Cmd(line)
 }
 
-func (self *Plotter) PlotXYZ(x,y,z []float, title string) os.Error {
+func (self *Plotter) PlotXYZ(x,y,z []float64, title string) os.Error {
 	npoints := min(len(x), len(y))
 	npoints = min(npoints, len(z))
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
@@ -202,9 +202,9 @@ func (self *Plotter) PlotXYZ(x,y,z []float, title string) os.Error {
 	return self.Cmd(line)
 }
 
-type Func func(x float) float
+type Func func(x float64) float64
 
-func (self *Plotter) PlotFunc(data []float, fct Func, title string) os.Error {
+func (self *Plotter) PlotFunc(data []float64, fct Func, title string) os.Error {
 	
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
 	if err != nil {
