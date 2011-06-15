@@ -1,12 +1,13 @@
 //
 package gnuplot
 
-import "os"
-import "io/ioutil"
-//import "bytes"
-//import "container/vector"
-import "exec"
-import "fmt"
+import (
+	"exec"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+)
 
 var g_gnuplot_cmd string
 var g_gnuplot_prefix string = "go-gnuplot-"
@@ -36,28 +37,21 @@ func (e *gnuplot_error) String() string {
 }
 type plotter_process struct {
 	handle  *exec.Cmd
+	stdin   io.WriteCloser
 }
 
 func new_plotter_proc(persist bool) (*plotter_process, os.Error) {
-	var proc_args []string
+	proc_args := []string{}
 	if persist {
-		proc_args = []string{"gnuplot", "-persist"}
-	} else {
-		proc_args = []string{"gnuplot"}
+		proc_args = append(proc_args, "-persist")
 	}
 	fmt.Printf("--> [%v] %v\n", g_gnuplot_cmd, proc_args)
-	stdin  := exec.Pipe
-	stdout := exec.Pipe
-	//stdout := exec.PassThrough
-	stderr := exec.MergeWithStdout
-
-	cmd, err := exec.Run(g_gnuplot_cmd, proc_args, os.Environ(), "", 
-		stdin, stdout, stderr)
-
+	cmd := exec.Command(g_gnuplot_cmd, proc_args...)
+	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, err
 	}
-	return &plotter_process{handle: cmd}, nil
+	return &plotter_process{handle: cmd, stdin: stdin}, cmd.Start()
 }
 
 type tmpfiles_db map[string]*os.File
@@ -73,7 +67,7 @@ type Plotter struct {
 
 func (self *Plotter) Cmd(format string, a ...interface{}) os.Error {
 	cmd := fmt.Sprintf(format, a...) + "\n"
-	n,err := self.proc.handle.Stdin.WriteString(cmd)
+	n,err := io.WriteString(self.proc.stdin, cmd)
 	
 	if self.debug {
 		//buf := new(bytes.Buffer)
@@ -95,7 +89,8 @@ func (self *Plotter) CheckedCmd(format string, a ...interface{}) {
 
 func (self *Plotter) Close() (err os.Error) {
 	if self.proc != nil && self.proc.handle != nil {
-		err = self.proc.handle.Close()
+		self.proc.stdin.Close()
+		err = self.proc.handle.Wait()
 	}
 	self.ResetPlot()
 	return err

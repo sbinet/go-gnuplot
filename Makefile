@@ -7,7 +7,7 @@ include ${GOROOT}/src/Make.inc
 all: install
 
 DIRS=\
-	src\
+	pkg/gnuplot\
 
 
 clean.dirs: $(addsuffix .clean, $(DIRS))

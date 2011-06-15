@@ -4,7 +4,7 @@
 
 include ${GOROOT}/src/Make.inc
 
-TARG=gnuplot
+TARG=bitbucket.org/binet/go-gnuplot/pkg/gnuplot
 GOFILES=\
 	gnuplot.go\
 

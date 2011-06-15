@@ -1,7 +1,8 @@
 package main
 
 import "fmt"
-import "gnuplot"
+import "bitbucket.org/binet/go-gnuplot/pkg/gnuplot"
+import "math"
 
 func main() {
 	fname := ""
@@ -15,17 +16,14 @@ func main() {
 	}
 	defer p.Close()
 
-	p.CheckedCmd("set grid x")
-	p.CheckedCmd("set grid y")
-	p.CheckedCmd("set grid z")
-	p.PlotNd(
-		"test Nd plot",
-		[]float64{0,1,2,3,4,5,6,7,8,9,10},
-		[]float64{0,1,2,3,4,5,6,7,8,9,10},
-		[]float64{0,1,2,3,4,5,6,7,8,9,10})
-	p.SetLabels("x", "y", "z")
+	p.SetStyle("steps")
+	p.PlotFunc([]float64{0,1,2,3,4,5,6,7,8,9,10}, 
+		func (x float64) float64 {return math.Exp(float64(x) + 2.)},
+		"test plot-func")
+	p.SetXLabel("my x data")
+	p.SetYLabel("my y data")
 	p.CheckedCmd("set terminal pdf")
-	p.CheckedCmd("set output 'plot006.pdf'")
+	p.CheckedCmd("set output 'plot004.pdf'")
 	p.CheckedCmd("replot")
 
 
