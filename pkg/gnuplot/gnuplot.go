@@ -12,8 +12,8 @@ import (
 var g_gnuplot_cmd string
 var g_gnuplot_prefix string = "go-gnuplot-"
 
-func min(a,b int) int {
-	if a<b {
+func min(a, b int) int {
+	if a < b {
 		return a
 	}
 	return b
@@ -32,12 +32,14 @@ func init() {
 type gnuplot_error struct {
 	err string
 }
+
 func (e *gnuplot_error) String() string {
 	return e.err
 }
+
 type plotter_process struct {
-	handle  *exec.Cmd
-	stdin   io.WriteCloser
+	handle *exec.Cmd
+	stdin  io.WriteCloser
 }
 
 func new_plotter_proc(persist bool) (*plotter_process, os.Error) {
@@ -57,18 +59,18 @@ func new_plotter_proc(persist bool) (*plotter_process, os.Error) {
 type tmpfiles_db map[string]*os.File
 
 type Plotter struct {
-	proc *plotter_process
-	debug bool
-	plotcmd string
-	nplots int // number of currently active plots
-	style  string // current plotting style
+	proc     *plotter_process
+	debug    bool
+	plotcmd  string
+	nplots   int    // number of currently active plots
+	style    string // current plotting style
 	tmpfiles tmpfiles_db
 }
 
 func (self *Plotter) Cmd(format string, a ...interface{}) os.Error {
 	cmd := fmt.Sprintf(format, a...) + "\n"
-	n,err := io.WriteString(self.proc.stdin, cmd)
-	
+	n, err := io.WriteString(self.proc.stdin, cmd)
+
 	if self.debug {
 		//buf := new(bytes.Buffer)
 		//io.Copy(buf, self.proc.handle.Stdout)
@@ -100,9 +102,12 @@ func (self *Plotter) PlotNd(title string, data ...[]float64) os.Error {
 	ndims := len(data)
 
 	switch ndims {
-	case 1: return self.PlotX(data[0], title)
-	case 2: return self.PlotXY(data[0], data[1], title)
-	case 3: return self.PlotXYZ(data[0], data[1], data[2], title)
+	case 1:
+		return self.PlotX(data[0], title)
+	case 2:
+		return self.PlotXY(data[0], data[1], title)
+	case 3:
+		return self.PlotXYZ(data[0], data[1], data[2], title)
 	}
 
 	return &gnuplot_error{fmt.Sprintf("invalid number of dims '%v'", ndims)}
@@ -115,15 +120,15 @@ func (self *Plotter) PlotX(data []float64, title string) os.Error {
 	}
 	fname := f.Name()
 	self.tmpfiles[fname] = f
-	for _,d := range data {
+	for _, d := range data {
 		f.WriteString(fmt.Sprintf("%v\n", d))
 	}
 	f.Close()
-	cmd := "plot"
+	cmd := self.plotcmd
 	if self.nplots > 0 {
 		cmd = "replot"
 	}
-	
+
 	var line string
 	if title == "" {
 		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, self.style)
@@ -135,7 +140,7 @@ func (self *Plotter) PlotX(data []float64, title string) os.Error {
 	return self.Cmd(line)
 }
 
-func (self *Plotter) PlotXY(x,y []float64, title string) os.Error {
+func (self *Plotter) PlotXY(x, y []float64, title string) os.Error {
 	npoints := min(len(x), len(y))
 
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
@@ -145,16 +150,16 @@ func (self *Plotter) PlotXY(x,y []float64, title string) os.Error {
 	fname := f.Name()
 	self.tmpfiles[fname] = f
 
-	for i:=0; i < npoints; i++ {
+	for i := 0; i < npoints; i++ {
 		f.WriteString(fmt.Sprintf("%v %v\n", x[i], y[i]))
 	}
 
 	f.Close()
-	cmd := "plot"
+	cmd := self.plotcmd
 	if self.nplots > 0 {
 		cmd = "replot"
 	}
-	
+
 	var line string
 	if title == "" {
 		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, self.style)
@@ -166,7 +171,7 @@ func (self *Plotter) PlotXY(x,y []float64, title string) os.Error {
 	return self.Cmd(line)
 }
 
-func (self *Plotter) PlotXYZ(x,y,z []float64, title string) os.Error {
+func (self *Plotter) PlotXYZ(x, y, z []float64, title string) os.Error {
 	npoints := min(len(x), len(y))
 	npoints = min(npoints, len(z))
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
@@ -176,16 +181,16 @@ func (self *Plotter) PlotXYZ(x,y,z []float64, title string) os.Error {
 	fname := f.Name()
 	self.tmpfiles[fname] = f
 
-	for i:=0; i < npoints; i++ {
+	for i := 0; i < npoints; i++ {
 		f.WriteString(fmt.Sprintf("%v %v %v\n", x[i], y[i], z[i]))
 	}
 
 	f.Close()
-	cmd := "splot"
+	cmd := "splot" // Force 3D plot
 	if self.nplots > 0 {
 		cmd = "replot"
 	}
-	
+
 	var line string
 	if title == "" {
 		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, self.style)
@@ -200,7 +205,7 @@ func (self *Plotter) PlotXYZ(x,y,z []float64, title string) os.Error {
 type Func func(x float64) float64
 
 func (self *Plotter) PlotFunc(data []float64, fct Func, title string) os.Error {
-	
+
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
 	if err != nil {
 		return err
@@ -208,16 +213,16 @@ func (self *Plotter) PlotFunc(data []float64, fct Func, title string) os.Error {
 	fname := f.Name()
 	self.tmpfiles[fname] = f
 
-	for _,x := range data {
+	for _, x := range data {
 		f.WriteString(fmt.Sprintf("%v %v\n", x, fct(x)))
 	}
 
 	f.Close()
-	cmd := "plot"
+	cmd := self.plotcmd
 	if self.nplots > 0 {
 		cmd = "replot"
 	}
-	
+
 	var line string
 	if title == "" {
 		line = fmt.Sprintf("%s \"%s\" with %s", cmd, fname, self.style)
@@ -229,6 +234,16 @@ func (self *Plotter) PlotFunc(data []float64, fct Func, title string) os.Error {
 	return self.Cmd(line)
 }
 
+func (self *Plotter) SetPlotCmd(cmd string) (err os.Error) {
+	switch cmd {
+	case "plot", "splot":
+		self.plotcmd = cmd
+	default:
+		err = os.NewError("invalid plot cmd [" + cmd + "]")
+	}
+	return err
+}
+
 func (self *Plotter) SetStyle(style string) (err os.Error) {
 	allowed := []string{
 		"lines", "points", "linepoints",
@@ -236,9 +251,10 @@ func (self *Plotter) SetStyle(style string) (err os.Error) {
 		"steps",
 		"errorbars",
 		"boxes",
-		"boxerrorbars"}
+		"boxerrorbars",
+		"pm3d"}
 
-	for _,s := range allowed {
+	for _, s := range allowed {
 		if s == style {
 			self.style = style
 			err = nil
@@ -273,9 +289,9 @@ func (self *Plotter) SetLabels(labels ...string) os.Error {
 	}
 	var err os.Error = nil
 
-	for i,label := range labels {
+	for i, label := range labels {
 		switch i {
-		case 0: 
+		case 0:
 			ierr := self.SetXLabel(label)
 			if ierr != nil {
 				err = ierr
@@ -311,8 +327,8 @@ func (self *Plotter) ResetPlot() (err os.Error) {
 }
 
 func NewPlotter(fname string, persist, debug bool) (*Plotter, os.Error) {
-	p := &Plotter{proc: nil, debug: debug, plotcmd: "plot", 
-	nplots:0, style:"points"}
+	p := &Plotter{proc: nil, debug: debug, plotcmd: "plot",
+		nplots: 0, style: "points"}
 	p.tmpfiles = make(tmpfiles_db)
 
 	if fname != "" {
