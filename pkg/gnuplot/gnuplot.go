@@ -34,7 +34,7 @@ type gnuplot_error struct {
 	err string
 }
 
-func (e *gnuplot_error) String() string {
+func (e *gnuplot_error) Error() string {
 	return e.err
 }
 
