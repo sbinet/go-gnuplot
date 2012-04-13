@@ -43,3 +43,11 @@ Example
     	return
     }
 
+
+Documentation
+-------------
+
+API documentation can be found here:
+
+ http://gopkgdoc.appspot.com/pkg/bitbucket.org/binet/go-gnuplot/pkg/gnuplot
+
