@@ -2,6 +2,11 @@ go-gnuplot
 ==========
 
 Simple-minded functions to work with ``gnuplot``.
+``go-gnuplot`` runs ``gnuplot`` as a subprocess and pushes commands
+via the ``STDIN`` of that subprocess.
+
+See http://www.gnuplot.info for more informations on the
+exact semantics of these commands.
 
 Installation
 ------------

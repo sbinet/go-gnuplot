@@ -1,4 +1,8 @@
-//
+// gnuplot is a simple minded set of functions to manage a gnuplot subprocess
+// in order to plot data.
+// See the gnuplot documentation page for the exact semantics of the gnuplot 
+// commands.
+//  http://www.gnuplot.info/
 package gnuplot
 
 import (
@@ -59,6 +63,8 @@ func new_plotter_proc(persist bool) (*plotter_process, error) {
 
 type tmpfiles_db map[string]*os.File
 
+// Plotter is a handle to a gnuplot subprocess, forwarding commands
+// via its stdin
 type Plotter struct {
 	proc     *plotter_process
 	debug    bool
@@ -68,6 +74,14 @@ type Plotter struct {
 	tmpfiles tmpfiles_db
 }
 
+// Cmd sends a command to the gnuplot subprocess and returns an error
+// if something bad happened in the gnuplot process.
+// ex:
+//   fname := "foo.dat"
+//   err := p.Cmd("plot %s", fname)
+//   if err != nil {
+//     panic(err)
+//   }
 func (self *Plotter) Cmd(format string, a ...interface{}) error {
 	cmd := fmt.Sprintf(format, a...) + "\n"
 	n, err := io.WriteString(self.proc.stdin, cmd)
@@ -82,6 +96,11 @@ func (self *Plotter) Cmd(format string, a ...interface{}) error {
 	return err
 }
 
+// CheckedCmd is a convenience wrapper around Cmd: it will panic if the 
+// error returned by Cmd isn't nil.
+// ex:
+//   fname := "foo.dat"
+//   p.CheckedCmd("plot %s", fname)
 func (self *Plotter) CheckedCmd(format string, a ...interface{}) {
 	err := self.Cmd(format, a...)
 	if err != nil {
@@ -90,6 +109,12 @@ func (self *Plotter) CheckedCmd(format string, a ...interface{}) {
 	}
 }
 
+// Close makes sure all resources used by the gnuplot subprocess are reclaimed.
+// This method is typically called when the Plotter instance is not needed
+// anymore. That's usually done via a defer statement:
+//   p, err := gnuplot.NewPlotter(...)
+//   if err != nil { /* handle error */ }
+//   defer p.Close()
 func (self *Plotter) Close() (err error) {
 	if self.proc != nil && self.proc.handle != nil {
 		self.proc.stdin.Close()
@@ -99,6 +124,14 @@ func (self *Plotter) Close() (err error) {
 	return err
 }
 
+// PlotNd will create an n-dimensional plot (up to 3) with a title `title`
+// and using the data from the var-arg `data`.
+// example:
+//  err = p.PlotNd(
+//           "test Nd plot",
+//           []float64{0,1,2,3}, // x-data
+//           []float64{0,1,2,3}, // y-data
+//           []float64{0,1,2,3}) // z-data
 func (self *Plotter) PlotNd(title string, data ...[]float64) error {
 	ndims := len(data)
 
@@ -114,6 +147,12 @@ func (self *Plotter) PlotNd(title string, data ...[]float64) error {
 	return &gnuplot_error{fmt.Sprintf("invalid number of dims '%v'", ndims)}
 }
 
+// PlotX will create a 2-d plot using `data` as input and `title` as the plot
+// title.
+// The index of the element in the `data` slice will be used as the x-coordinate
+// and its correspinding value as the y-coordinate.
+// Example:
+//  err = p.PlotX([]float64{10, 20, 30}, "my title")
 func (self *Plotter) PlotX(data []float64, title string) error {
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
 	if err != nil {
@@ -141,6 +180,17 @@ func (self *Plotter) PlotX(data []float64, title string) error {
 	return self.Cmd(line)
 }
 
+// PlotXY will create a 2-d plot using `x` and `y` as input and `title` as 
+// the plot title.
+// The values of the `x` slice will be used as x-coordinates and the matching
+// values of `y` as y-coordinates (ie: for the same index).
+// If the lengthes of the slices do not match, the range for the data will be
+// the smallest size of the two slices.
+// Example:
+//  err = p.PlotXY(
+//           []float64{10, 20, 30},
+//           []float64{11, 22, 33, 44},
+//           "my title")
 func (self *Plotter) PlotXY(x, y []float64, title string) error {
 	npoints := min(len(x), len(y))
 
@@ -172,6 +222,16 @@ func (self *Plotter) PlotXY(x, y []float64, title string) error {
 	return self.Cmd(line)
 }
 
+// PlotXYZ will create a 3-d plot using `x`, `y` and `z` as input and 
+// `title` as the plot title.
+// The data points to be plotted are the triplets (x[i], y[i], z[i]) where
+// `i` runs from 0 to the smallest length of the 3 slices.
+// Example:
+//  err = p.PlotXYZ(
+//           []float64{10, 20, 30},
+//           []float64{11, 22, 33, 44},
+//           []float64{111, 222, 333, 444, 555},
+//           "my title")
 func (self *Plotter) PlotXYZ(x, y, z []float64, title string) error {
 	npoints := min(len(x), len(y))
 	npoints = min(npoints, len(z))
@@ -203,8 +263,17 @@ func (self *Plotter) PlotXYZ(x, y, z []float64, title string) error {
 	return self.Cmd(line)
 }
 
+// Func is a 1-d function which can be plotted with gnuplot
 type Func func(x float64) float64
 
+// PlotFunc will create a 2-d plot using `data` as x-coordinates and `fct(x[i])`
+// as the y-coordinates.
+// Example:
+//  fct := funct (x float64) float64 { return math.Exp(float64(x) + 2.) }
+//  err = p.PlotFunc(
+//           []float64{0,1,2,3,4,5},
+//           fct,
+//           "my title")
 func (self *Plotter) PlotFunc(data []float64, fct Func, title string) error {
 
 	f, err := ioutil.TempFile(os.TempDir(), g_gnuplot_prefix)
@@ -235,6 +304,8 @@ func (self *Plotter) PlotFunc(data []float64, fct Func, title string) error {
 	return self.Cmd(line)
 }
 
+// SetPlotCmd changes the command used for plotting by the gnuplot subprocess.
+// Only valid plot commands are accepted (plot, splot)
 func (self *Plotter) SetPlotCmd(cmd string) (err error) {
 	switch cmd {
 	case "plot", "splot":
@@ -245,6 +316,18 @@ func (self *Plotter) SetPlotCmd(cmd string) (err error) {
 	return err
 }
 
+// SetStyle changes the style used by the gnuplot subprocess.
+// Only valid styles are accepted:
+//      "lines", 
+//      "points", 
+//      "linepoints",
+// 		"impulses", 
+//      "dots",
+// 		"steps",
+// 		"errorbars",
+// 		"boxes",
+// 		"boxerrorbars",
+// 		"pm3d"
 func (self *Plotter) SetStyle(style string) (err error) {
 	allowed := []string{
 		"lines", "points", "linepoints",
@@ -271,18 +354,25 @@ func (self *Plotter) SetStyle(style string) (err error) {
 	return err
 }
 
+// SetXLabel changes the label for the x-axis
 func (self *Plotter) SetXLabel(label string) error {
 	return self.Cmd(fmt.Sprintf("set xlabel '%s'", label))
 }
 
+// SetYLabel changes the label for the y-axis
 func (self *Plotter) SetYLabel(label string) error {
 	return self.Cmd(fmt.Sprintf("set ylabel '%s'", label))
 }
 
+// SetZLabel changes the label for the z-axis
 func (self *Plotter) SetZLabel(label string) error {
 	return self.Cmd(fmt.Sprintf("set zlabel '%s'", label))
 }
 
+// SetLabels changes the labels for the x-,y- and z-axis in one go, depending
+// on the size of the `labels` var-arg.
+// Example:
+//  err = p.SetLabels("x", "y", "z")
 func (self *Plotter) SetLabels(labels ...string) error {
 	ndims := len(labels)
 	if ndims > 3 || ndims <= 0 {
@@ -315,6 +405,7 @@ func (self *Plotter) SetLabels(labels ...string) error {
 	return nil
 }
 
+// ResetPlot clears up all plots and sets the Plotter state anew.
 func (self *Plotter) ResetPlot() (err error) {
 	for fname, fhandle := range self.tmpfiles {
 		ferr := fhandle.Close()
@@ -327,6 +418,16 @@ func (self *Plotter) ResetPlot() (err error) {
 	return err
 }
 
+// NewPlotter creates a new Plotter instance.
+//  - `fname` is the name of the file containing commands (should be empty for now)
+//  - `persist` is a flag to run the gnuplot subprocess with '-persist' so the
+//    plot window isn't closed after sending a command
+//  - `debug` is a flag to tell go-gnuplot to print out every command sent to
+//    the gnuplot subprocess.
+// Example:
+//  p, err := gnuplot.NewPlotter("", false, false)
+//  if err != nil { /* handle error */ }
+//  defer p.Close()
 func NewPlotter(fname string, persist, debug bool) (*Plotter, error) {
 	p := &Plotter{proc: nil, debug: debug, plotcmd: "plot",
 		nplots: 0, style: "points"}
