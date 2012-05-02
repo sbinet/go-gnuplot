@@ -48,7 +48,7 @@ Example
     	return
     }
 
-.. image:: https://bitbucket.org/binet/go-gnuplot/raw/tip/examples/imgs/plot002.pdf
+.. image:: https://bitbucket.org/binet/go-gnuplot/raw/tip/examples/imgs/plot002.png
 
 
 Documentation
