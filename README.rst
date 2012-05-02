@@ -48,6 +48,8 @@ Example
     	return
     }
 
+.. image:: https://bitbucket.org/binet/go-gnuplot/src/tip/examples/imgs/plot002.pdf
+
 
 Documentation
 -------------
