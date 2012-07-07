@@ -48,7 +48,7 @@ Example
     	return
     }
 
-.. image:: https://github.com/sbinet/go-gnuplot/raw/tip/examples/imgs/plot002.png
+.. image:: https://github.com/sbinet/go-gnuplot/blob/master/examples/imgs/plot002.png
 
 
 Documentation
