@@ -13,7 +13,7 @@ Installation
 
 The ``go-gnuplot`` package is ``go get`` installable::
 
-   $ go get bitbucket.org/binet/go-gnuplot/pkg/gnuplot
+   $ go get github.com/sbinet/go-gnuplot/pkg/gnuplot
 
 
 Example
@@ -23,7 +23,7 @@ Example
 
     package main
     
-    import "bitbucket.org/binet/go-gnuplot/pkg/gnuplot"
+    import "github.com/sbinet/go-gnuplot/pkg/gnuplot"
     import "fmt"
     
     func main() {
@@ -48,7 +48,7 @@ Example
     	return
     }
 
-.. image:: https://bitbucket.org/binet/go-gnuplot/raw/tip/examples/imgs/plot002.png
+.. image:: https://github.com/sbinet/go-gnuplot/raw/tip/examples/imgs/plot002.png
 
 
 Documentation
@@ -56,5 +56,5 @@ Documentation
 
 API documentation can be found here:
 
- http://gopkgdoc.appspot.com/pkg/bitbucket.org/binet/go-gnuplot/pkg/gnuplot
+ http://gopkgdoc.appspot.com/pkg/github.com/sbinet/go-gnuplot/pkg/gnuplot
 
