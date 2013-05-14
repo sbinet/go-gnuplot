@@ -1,15 +1,16 @@
 package main
 
 import "fmt"
+
 //import "io/ioutil"
-import "github.com/sbinet/go-gnuplot/pkg/gnuplot"
+import "github.com/sbinet/go-gnuplot"
 
 func main() {
 	fname := ""
 	persist := false
 	debug := true
 
-	p,err := gnuplot.NewPlotter(fname, persist, debug)
+	p, err := gnuplot.NewPlotter(fname, persist, debug)
 	if err != nil {
 		err_string := fmt.Sprintf("** err: %v\n", err)
 		panic(err_string)

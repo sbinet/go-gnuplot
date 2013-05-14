@@ -1,6 +1,6 @@
 // gnuplot is a simple minded set of functions to manage a gnuplot subprocess
 // in order to plot data.
-// See the gnuplot documentation page for the exact semantics of the gnuplot 
+// See the gnuplot documentation page for the exact semantics of the gnuplot
 // commands.
 //  http://www.gnuplot.info/
 package gnuplot
@@ -96,7 +96,7 @@ func (self *Plotter) Cmd(format string, a ...interface{}) error {
 	return err
 }
 
-// CheckedCmd is a convenience wrapper around Cmd: it will panic if the 
+// CheckedCmd is a convenience wrapper around Cmd: it will panic if the
 // error returned by Cmd isn't nil.
 // ex:
 //   fname := "foo.dat"
@@ -180,7 +180,7 @@ func (self *Plotter) PlotX(data []float64, title string) error {
 	return self.Cmd(line)
 }
 
-// PlotXY will create a 2-d plot using `x` and `y` as input and `title` as 
+// PlotXY will create a 2-d plot using `x` and `y` as input and `title` as
 // the plot title.
 // The values of the `x` slice will be used as x-coordinates and the matching
 // values of `y` as y-coordinates (ie: for the same index).
@@ -222,7 +222,7 @@ func (self *Plotter) PlotXY(x, y []float64, title string) error {
 	return self.Cmd(line)
 }
 
-// PlotXYZ will create a 3-d plot using `x`, `y` and `z` as input and 
+// PlotXYZ will create a 3-d plot using `x`, `y` and `z` as input and
 // `title` as the plot title.
 // The data points to be plotted are the triplets (x[i], y[i], z[i]) where
 // `i` runs from 0 to the smallest length of the 3 slices.
@@ -318,10 +318,10 @@ func (self *Plotter) SetPlotCmd(cmd string) (err error) {
 
 // SetStyle changes the style used by the gnuplot subprocess.
 // Only valid styles are accepted:
-//      "lines", 
-//      "points", 
+//      "lines",
+//      "points",
 //      "linepoints",
-// 		"impulses", 
+// 		"impulses",
 //      "dots",
 // 		"steps",
 // 		"errorbars",
