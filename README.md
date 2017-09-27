@@ -8,13 +8,20 @@ via the ``STDIN`` of that subprocess.
 See http://www.gnuplot.info for more informations on the
 exact semantics of these commands.
 
+This is a fork of
+[sbinet/go-gnuplot](https://www.github.com/sbinet/go-gnuplot). The fork is
+motivated by the lack of maintenance to the original repo. This version will
+aim to extend on and fix bugs with the original implementation. The original
+API will not change so that this can become a drag and drop replacement of the
+original. See the issues for specific planned changes.
+
 Installation
 ------------
 
 The ``go-gnuplot`` package is ``go get`` installable:
 
 ```sh
-$ go get github.com/sbinet/go-gnuplot
+$ go get github.com/ckitagawa/go-gnuplot
 ```
 
 Example
@@ -23,8 +30,10 @@ Example
 ```go
 package main
 
-import "github.com/sbinet/go-gnuplot"
-import "fmt"
+import (
+  "github.com/ckitagawa/go-gnuplot"
+  "fmt"
+)
 
 func main() {
 	fname := ""
@@ -49,7 +58,7 @@ func main() {
 }
 ```
 
-![plot-t-002](https://github.com/sbinet/go-gnuplot/raw/master/examples/imgs/plot002.png)
+![plot-t-002](https://github.com/ckitagawa/go-gnuplot/raw/master/examples/imgs/plot002.png)
 
 
 Documentation
@@ -57,5 +66,4 @@ Documentation
 
 API documentation can be found here:
 
- http://godoc.org/github.com/sbinet/go-gnuplot
-
+ http://godoc.org/github.com/ckitagawa/go-gnuplot

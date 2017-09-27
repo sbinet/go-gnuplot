@@ -17,6 +17,10 @@ import (
 var g_gnuplot_cmd string
 var g_gnuplot_prefix string = "go-gnuplot-"
 
+type gnuplot_error struct {
+	err string
+}
+
 func min(a, b int) int {
 	if a < b {
 		return a
@@ -32,10 +36,6 @@ func init() {
 		panic("could not find 'gnuplot'")
 	}
 	fmt.Printf("-- found gnuplot command: %s\n", g_gnuplot_cmd)
-}
-
-type gnuplot_error struct {
-	err string
 }
 
 func (e *gnuplot_error) Error() string {
@@ -318,11 +318,11 @@ func (self *Plotter) SetPlotCmd(cmd string) (err error) {
 
 // SetStyle changes the style used by the gnuplot subprocess.
 // Only valid styles are accepted:
-//      "lines",
-//      "points",
-//      "linepoints",
+//    "lines",
+//    "points",
+//    "linespoints",
 // 		"impulses",
-//      "dots",
+//    "dots",
 // 		"steps",
 // 		"errorbars",
 // 		"boxes",
@@ -330,13 +330,17 @@ func (self *Plotter) SetPlotCmd(cmd string) (err error) {
 // 		"pm3d"
 func (self *Plotter) SetStyle(style string) (err error) {
 	allowed := []string{
-		"lines", "points", "linepoints",
-		"impulses", "dots",
+		"lines", 
+		"points", 
+		"linespoints",
+		"impulses", 
+		"dots",
 		"steps",
 		"errorbars",
 		"boxes",
 		"boxerrorbars",
-		"pm3d"}
+		"pm3d"
+	}
 
 	for _, s := range allowed {
 		if s == style {
@@ -421,9 +425,9 @@ func (self *Plotter) ResetPlot() (err error) {
 // NewPlotter creates a new Plotter instance.
 //  - `fname` is the name of the file containing commands (should be empty for now)
 //  - `persist` is a flag to run the gnuplot subprocess with '-persist' so the
-//    plot window isn't closed after sending a command
+//     plot window isn't closed after sending a command
 //  - `debug` is a flag to tell go-gnuplot to print out every command sent to
-//    the gnuplot subprocess.
+//     the gnuplot subprocess.
 // Example:
 //  p, err := gnuplot.NewPlotter("", false, false)
 //  if err != nil { /* handle error */ }
@@ -444,5 +448,3 @@ func NewPlotter(fname string, persist, debug bool) (*Plotter, error) {
 	}
 	return p, nil
 }
-
-/* EOF */
